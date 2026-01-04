@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Morning Reset</title>
+
+  <!-- App Install -->
+  <link rel="manifest" href="manifest.json">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: #0a0a0a;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .card {
+      background: #111;
+      padding: 24px;
+      border-radius: 20px;
+      width: 320px;
+      text-align: center;
+    }
+    button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 16px;
+      border: none;
+      border-radius: 12px;
+      background: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .streak {
+      color: orange;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    .timer {
+      font-size: 32px;
+      margin-top: 10px;
+      font-family: monospace;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <div class="streak">🔥 <span id="streak">0</span>-day streak</div>
+    <h2 id="title"></h2>
+    <p id="desc"></p>
+    <div class="timer" id="timer"></div>
+    <button onclick="nextStep()">Done</button>
+  </div>
+
+<script>
+const routine = [
+  { title: "Drink Water", time: 60, desc: "Drink one full glass of water." },
+  { title: "Neck Rolls", time: 120, desc: "Slow neck rolls to activate lymph flow." },
+  { title: "Face Massage", time: 180, desc: "Jaw, cheeks, under-eye drainage." },
+  { title: "Jaw Release", time: 120, desc: "Lion face + jaw stretch." },
+  { title: "Posture & Breathing", time: 60, desc: "Deep breathing, straight posture." }
+];
+
+let step = 0;
+let seconds = routine[0].time;
+let streak = localStorage.getItem("streak") || 0;
+
+document.getElementById("streak").textContent = streak;
+
+function render() {
+  document.getElementById("title").textContent = routine[step].title;
+  document.getElementById("desc").textContent = routine[step].desc;
+}
+render();
+
+setInterval(() => {
+  if (seconds > 0) seconds--;
+  document.getElementById("timer").textContent =
+    Math.floor(seconds / 60) + ":" + String(seconds % 60).padStart(2, "0");
+}, 1000);
+
+function nextStep() {
+  navigator.vibrate?.(30);
+  if (step < routine.length - 1) {
+    step++;
+    seconds = routine[step].time;
+    render();
+  } else {
+    streak++;
+    localStorage.setItem("streak", streak);
+    alert("Routine complete. See you tomorrow.");
+    location.reload();
+  }
+}
+
+if ("Notification" in window) {
+  Notification.requestPermission();
+}
+</script>
+</body>
+</html>
